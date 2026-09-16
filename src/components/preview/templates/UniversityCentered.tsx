@@ -1,5 +1,6 @@
 import React from 'react';
 import { CoverData } from '../../../types/cover';
+import { CoverLogo } from '../CoverLogo';
 
 interface TemplateProps {
   coverData: CoverData;
@@ -35,18 +36,12 @@ export const UniversityCentered: React.FC<TemplateProps> = ({ coverData }) => {
     >
       {/* 1. Large Central University Emblem & Institutional Masthead */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-        {customization.logoPosition !== 'hidden' && university.logoUrl && (
-          <div style={{ marginBottom: '18px', display: 'flex', justifyContent: 'center' }}>
-            <img
-              src={university.logoUrl}
-              alt={university.shortName}
-              style={{ maxHeight: logoDimensions, maxWidth: '220px', objectFit: 'contain' }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          </div>
-        )}
+        <CoverLogo
+          coverData={coverData}
+          maxHeight={logoDimensions}
+          maxWidth="220px"
+          style={{ marginBottom: '18px' }}
+        />
 
         <h1
           style={{

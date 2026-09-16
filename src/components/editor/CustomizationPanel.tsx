@@ -3,16 +3,13 @@ import { useCoverDesigner } from '../../context/CoverDesignerContext';
 import { ACADEMIC_FONTS } from '../../data/fonts';
 import {
   Type,
-  Maximize2,
   AlignCenter,
   AlignLeft,
-  Square,
   Palette,
   RotateCcw,
-  Sparkles,
-  Layers,
 } from 'lucide-react';
-import { BorderStyle, TextAlignment, LogoSize, LogoPosition, SpacingDensity, TextCasing } from '../../types/cover';
+import { BorderStyle, LogoSize, LogoPosition, SpacingDensity, TextCasing } from '../../types/cover';
+import { ExportSection } from '../common/ExportSection';
 
 const ACCENT_COLOR_PRESETS = [
   { name: 'Navy Blue', hex: '#1e3a8a' },
@@ -272,7 +269,12 @@ export const CustomizationPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Reset Design Button */}
+      {/* 8. Export Cover Page Section */}
+      <div style={{ marginTop: '0.5rem' }}>
+        <ExportSection />
+      </div>
+
+      {/* Reset Section */}
       <div
         style={{
           marginTop: '0.5rem',

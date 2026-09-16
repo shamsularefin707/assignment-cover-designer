@@ -1,5 +1,6 @@
 import React from 'react';
 import { CoverData } from '../../../types/cover';
+import { CoverLogo } from '../CoverLogo';
 
 interface TemplateProps {
   coverData: CoverData;
@@ -58,16 +59,7 @@ export const MinimalModern: React.FC<TemplateProps> = ({ coverData }) => {
           </p>
         </div>
 
-        {customization.logoPosition !== 'hidden' && university.logoUrl && (
-          <img
-            src={university.logoUrl}
-            alt={university.shortName}
-            style={{ height: logoDimensions, maxWidth: '140px', objectFit: 'contain' }}
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        )}
+        <CoverLogo coverData={coverData} maxHeight={logoDimensions} maxWidth="140px" />
       </div>
 
       {/* 2. Middle Section: Bold Editorial Assignment Headline */}

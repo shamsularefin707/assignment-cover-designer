@@ -12,6 +12,14 @@ export interface University {
   departments: string[];
 }
 
+export type LogoSource = 'university' | 'custom' | 'none';
+
+export interface LogoState {
+  source: LogoSource;
+  src: string | null;
+  fileName?: string;
+}
+
 export interface StudentVisibleFields {
   rollNo: boolean;
   regNo: boolean;
@@ -121,6 +129,7 @@ export interface CoverData {
     logoUrl: string;
     isCustomLogo: boolean;
   };
+  logo: LogoState;
   department: {
     name: string;
     isCustom: boolean;

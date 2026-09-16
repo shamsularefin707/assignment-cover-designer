@@ -57,7 +57,7 @@ interface CoverDesignerContextType {
   updateSubmission: (updates: Partial<SubmissionInfo>) => void;
   updateAdditional: (updates: Partial<AdditionalInfo>) => void;
   updateCustomization: (updates: Partial<CustomizationSettings>) => void;
-  setCustomLogo: (dataUrl: string | null) => void;
+  setCustomLogo: (dataUrl: string | null, fileName?: string) => void;
   applyTemplate: (templateId: string) => void;
   loadPreset: (presetData: Partial<CoverData>, name?: string) => void;
   resetDesign: () => void;
@@ -112,6 +112,11 @@ export const CoverDesignerProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateUniversity = useCallback(
     (univ: University | null, customName?: string, customShortName?: string) => {
       setCoverData((prev) => {
+        // Requirement: Do NOT unexpectedly delete a custom logo when switching universities
+        const hasCustomLogo = prev.logo?.source === 'custom' && !!prev.logo.src;
+        const defaultLogo = univ ? getUniversityLogo(univ) : '';
+        const activeLogoSrc = hasCustomLogo ? prev.logo.src : defaultLogo;
+
         if (!univ) {
           return {
             ...prev,
@@ -122,13 +127,15 @@ export const CoverDesignerProvider: React.FC<{ children: React.ReactNode }> = ({
               shortName: customShortName || 'CU',
               domain: '',
               location: '',
-              logoUrl: '',
-              isCustomLogo: true,
+              logoUrl: activeLogoSrc || '',
+              isCustomLogo: hasCustomLogo,
             },
+            logo: hasCustomLogo
+              ? prev.logo
+              : { source: 'none', src: null },
           };
         }
 
-        const logoUrl = getUniversityLogo(univ);
         const defaultDept = univ.departments[0] || 'Department of Computer Science and Engineering';
 
         return {
@@ -139,9 +146,12 @@ export const CoverDesignerProvider: React.FC<{ children: React.ReactNode }> = ({
             shortName: univ.shortName,
             domain: univ.domain,
             location: univ.location,
-            logoUrl: prev.customization.customLogoUrl || logoUrl,
-            isCustomLogo: !!prev.customization.customLogoUrl,
+            logoUrl: activeLogoSrc || defaultLogo,
+            isCustomLogo: hasCustomLogo,
           },
+          logo: hasCustomLogo
+            ? prev.logo
+            : { source: 'university', src: defaultLogo },
           department: {
             name: defaultDept,
             isCustom: false,
@@ -217,35 +227,55 @@ export const CoverDesignerProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const setCustomLogo = useCallback(
-    (dataUrl: string | null) => {
+    (dataUrl: string | null, fileName?: string) => {
       setCoverData((prev) => {
-        let logoUrl = dataUrl;
-        let isCustomLogo = true;
-
-        if (!dataUrl) {
-          isCustomLogo = false;
-          const currentUniv = BANGLADESH_UNIVERSITIES.find((u) => u.id === prev.university.id);
-          logoUrl = currentUniv ? getUniversityLogo(currentUniv) : '';
+        if (dataUrl) {
+          return {
+            ...prev,
+            logo: {
+              source: 'custom',
+              src: dataUrl,
+              fileName: fileName || 'custom-logo.png',
+            },
+            university: {
+              ...prev.university,
+              logoUrl: dataUrl,
+              isCustomLogo: true,
+            },
+            customization: {
+              ...prev.customization,
+              customLogoUrl: dataUrl,
+            },
+          };
         }
+
+        // Reverting to default university logo
+        const currentUniv = BANGLADESH_UNIVERSITIES.find((u) => u.id === prev.university.id);
+        const defaultLogo = currentUniv ? getUniversityLogo(currentUniv) : '';
 
         return {
           ...prev,
+          logo: {
+            source: 'university',
+            src: defaultLogo,
+            fileName: undefined,
+          },
           university: {
             ...prev.university,
-            logoUrl: logoUrl || '',
-            isCustomLogo,
+            logoUrl: defaultLogo,
+            isCustomLogo: false,
           },
           customization: {
             ...prev.customization,
-            customLogoUrl: dataUrl,
+            customLogoUrl: null,
           },
         };
       });
 
       if (dataUrl) {
-        showToast('Custom logo uploaded successfully', 'success');
+        showToast('Custom logo applied to cover page', 'success');
       } else {
-        showToast('Restored official university logo', 'info');
+        showToast('Restored default university logo', 'info');
       }
     },
     [showToast]

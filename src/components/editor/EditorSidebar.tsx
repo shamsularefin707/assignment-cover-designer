@@ -113,6 +113,9 @@ export const EditorSidebar: React.FC = () => {
             <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1.25rem' }}>
               <DepartmentSelector />
             </div>
+            <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1.25rem' }}>
+              <LogoUploader />
+            </div>
           </>
         )}
 

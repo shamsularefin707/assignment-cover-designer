@@ -1,5 +1,6 @@
 import React from 'react';
 import { CoverData } from '../../../types/cover';
+import { CoverLogo } from '../CoverLogo';
 
 interface TemplateProps {
   coverData: CoverData;
@@ -33,18 +34,12 @@ export const TechnicalReport: React.FC<TemplateProps> = ({ coverData }) => {
     >
       {/* 1. Engineering Header with Logo */}
       <div style={{ textAlign: 'center', borderBottom: `2px solid ${accent}`, paddingBottom: '16px' }}>
-        {customization.logoPosition !== 'hidden' && university.logoUrl && (
-          <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'center' }}>
-            <img
-              src={university.logoUrl}
-              alt={university.shortName}
-              style={{ maxHeight: logoDimensions, maxWidth: '160px', objectFit: 'contain' }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          </div>
-        )}
+        <CoverLogo
+          coverData={coverData}
+          maxHeight={logoDimensions}
+          maxWidth="160px"
+          style={{ marginBottom: '10px' }}
+        />
 
         <h1
           style={{

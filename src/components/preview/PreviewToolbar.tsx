@@ -11,6 +11,7 @@ import {
   Loader2,
   Share2,
   FileDown,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { exportToPdf } from '../../utils/exportPdf';
 import { exportToImage } from '../../utils/exportImage';
@@ -31,40 +32,58 @@ export const PreviewToolbar: React.FC<{
 
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingPng, setIsExportingPng] = useState(false);
+  const [isExportingJpg, setIsExportingJpg] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [saveTitle, setSaveTitle] = useState(
     `${coverData.course.code || 'Course'} - ${coverData.university.shortName || 'Univ'} Assignment`
   );
 
+  const getTargetElement = (): HTMLElement | null => {
+    return pageRef.current || document.getElementById('assignment-cover-page');
+  };
+
   const handlePdfDownload = async () => {
-    if (!pageRef.current) return;
+    const el = getTargetElement();
+    if (!el) {
+      showToast('Could not find cover preview to export.', 'error');
+      return;
+    }
     setIsExportingPdf(true);
     try {
       await exportToPdf({
-        element: pageRef.current,
+        element: el,
         coverData,
         onProgress: (msg) => console.log(msg),
       });
       showToast('PDF downloaded successfully!', 'success');
     } catch (err) {
       console.error('PDF export failed:', err);
-      showToast('Failed to generate PDF. Please try the Print A4 option.', 'error');
+      showToast('Could not generate the PDF. Please try again or use Print A4.', 'error');
     } finally {
       setIsExportingPdf(false);
     }
   };
 
-  const handlePngDownload = async () => {
-    if (!pageRef.current) return;
-    setIsExportingPng(true);
+  const handleImageDownload = async (format: 'png' | 'jpg') => {
+    const el = getTargetElement();
+    if (!el) {
+      showToast('Could not find cover preview to export.', 'error');
+      return;
+    }
+    const setExporting = format === 'png' ? setIsExportingPng : setIsExportingJpg;
+    setExporting(true);
     try {
-      await exportToImage(pageRef.current, coverData);
-      showToast('High-resolution PNG downloaded!', 'success');
+      await exportToImage({
+        element: el,
+        coverData,
+        format,
+      });
+      showToast(`${format.toUpperCase()} image downloaded successfully!`, 'success');
     } catch (err) {
-      console.error('PNG export failed:', err);
-      showToast('Failed to export image.', 'error');
+      console.error(`${format} export failed:`, err);
+      showToast(`Failed to export ${format.toUpperCase()} image.`, 'error');
     } finally {
-      setIsExportingPng(false);
+      setExporting(false);
     }
   };
 
@@ -174,12 +193,24 @@ export const PreviewToolbar: React.FC<{
           <button
             type="button"
             className="btn btn-secondary btn-sm"
-            onClick={handlePngDownload}
-            disabled={isExportingPng}
-            title="Download high-resolution image"
+            onClick={() => handleImageDownload('png')}
+            disabled={isExportingPng || isExportingPdf || isExportingJpg}
+            title="Download high-resolution 300 DPI PNG image"
           >
             {isExportingPng ? <Loader2 size={15} className="animate-spin" /> : <FileImage size={15} />}
-            <span className="hide-on-mobile">PNG Image</span>
+            <span className="hide-on-mobile">PNG</span>
+          </button>
+
+          {/* Download JPG */}
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => handleImageDownload('jpg')}
+            disabled={isExportingPng || isExportingPdf || isExportingJpg}
+            title="Download high-resolution JPG image"
+          >
+            {isExportingJpg ? <Loader2 size={15} className="animate-spin" /> : <ImageIcon size={15} />}
+            <span className="hide-on-mobile">JPG</span>
           </button>
 
           {/* Print A4 */}
@@ -198,7 +229,7 @@ export const PreviewToolbar: React.FC<{
             type="button"
             className="btn btn-primary btn-sm"
             onClick={handlePdfDownload}
-            disabled={isExportingPdf}
+            disabled={isExportingPdf || isExportingPng || isExportingJpg}
             style={{ padding: '0.45rem 0.95rem' }}
             title="Generate high-DPI A4 PDF"
           >

@@ -1,5 +1,6 @@
 import React from 'react';
 import { CoverData } from '../../../types/cover';
+import { CoverLogo } from '../CoverLogo';
 
 interface TemplateProps {
   coverData: CoverData;
@@ -79,7 +80,7 @@ export const CleanGrid: React.FC<TemplateProps> = ({ coverData }) => {
           </h2>
         </div>
 
-        {customization.logoPosition !== 'hidden' && university.logoUrl && (
+        {customization.logoPosition !== 'hidden' && (
           <div
             style={{
               backgroundColor: '#ffffff',
@@ -92,14 +93,7 @@ export const CleanGrid: React.FC<TemplateProps> = ({ coverData }) => {
               flexShrink: 0,
             }}
           >
-            <img
-              src={university.logoUrl}
-              alt={university.shortName}
-              style={{ maxHeight: logoDimensions, maxWidth: '130px', objectFit: 'contain' }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
+            <CoverLogo coverData={coverData} maxHeight={logoDimensions} maxWidth="130px" />
           </div>
         )}
       </div>

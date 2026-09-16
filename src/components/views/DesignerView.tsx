@@ -3,15 +3,59 @@ import { useCoverDesigner } from '../../context/CoverDesignerContext';
 import { EditorSidebar } from '../editor/EditorSidebar';
 import { CoverPreview } from '../preview/CoverPreview';
 import { PreviewToolbar } from '../preview/PreviewToolbar';
-import { Edit3, Eye, Download, Printer } from 'lucide-react';
+import { Edit3, Eye, Download, Printer, FileImage, Loader2 } from 'lucide-react';
+import { exportToPdf } from '../../utils/exportPdf';
+import { exportToImage } from '../../utils/exportImage';
 
 export const DesignerView: React.FC = () => {
   const pageRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { triggerPrint } = useCoverDesigner();
+  const { coverData, triggerPrint, showToast } = useCoverDesigner();
 
   // Mobile view mode toggle: 'editor' vs 'preview'
   const [mobileMode, setMobileMode] = useState<'editor' | 'preview'>('editor');
+  const [isMobilePdf, setIsMobilePdf] = useState(false);
+  const [isMobilePng, setIsMobilePng] = useState(false);
+
+  const getTargetElement = (): HTMLElement | null => {
+    return pageRef.current || document.getElementById('assignment-cover-page');
+  };
+
+  const handleMobilePdf = async () => {
+    const el = getTargetElement();
+    if (!el) {
+      showToast('Could not find cover preview to export.', 'error');
+      return;
+    }
+    setIsMobilePdf(true);
+    try {
+      await exportToPdf({ element: el, coverData });
+      showToast('PDF downloaded successfully!', 'success');
+    } catch (err) {
+      console.error('Mobile PDF export failed:', err);
+      showToast('Could not generate the PDF. Please try Print.', 'error');
+    } finally {
+      setIsMobilePdf(false);
+    }
+  };
+
+  const handleMobilePng = async () => {
+    const el = getTargetElement();
+    if (!el) {
+      showToast('Could not find cover preview to export.', 'error');
+      return;
+    }
+    setIsMobilePng(true);
+    try {
+      await exportToImage({ element: el, coverData, format: 'png' });
+      showToast('PNG downloaded successfully!', 'success');
+    } catch (err) {
+      console.error('Mobile PNG export failed:', err);
+      showToast('Could not generate PNG image.', 'error');
+    } finally {
+      setIsMobilePng(false);
+    }
+  };
 
   return (
     <div
@@ -108,38 +152,60 @@ export const DesignerView: React.FC = () => {
           right: 0,
           backgroundColor: 'var(--bg-surface-elevated)',
           borderTop: '1px solid var(--border-medium)',
-          padding: '0.5rem 1rem',
+          padding: '0.5rem 0.75rem',
           boxShadow: '0 -4px 12px rgba(0,0,0,0.1)',
           zIndex: 80,
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: '0.5rem',
+          gap: '0.375rem',
         }}
       >
         <button
           type="button"
           className="btn btn-secondary btn-sm"
-          style={{ flex: 1 }}
+          style={{ padding: '0.4rem 0.6rem' }}
           onClick={() => setMobileMode(mobileMode === 'editor' ? 'preview' : 'editor')}
         >
           {mobileMode === 'editor' ? (
             <>
-              <Eye size={15} /> Preview A4
+              <Eye size={15} /> Preview
             </>
           ) : (
             <>
-              <Edit3 size={15} /> Back to Edit
+              <Edit3 size={15} /> Edit
             </>
           )}
         </button>
 
         <button
           type="button"
+          className="btn btn-primary btn-sm"
+          style={{ flex: 1, padding: '0.4rem 0.5rem' }}
+          onClick={handleMobilePdf}
+          disabled={isMobilePdf || isMobilePng}
+        >
+          {isMobilePdf ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+          <span>PDF</span>
+        </button>
+
+        <button
+          type="button"
           className="btn btn-secondary btn-sm"
-          style={{ flex: 1 }}
+          style={{ flex: 1, padding: '0.4rem 0.5rem' }}
+          onClick={handleMobilePng}
+          disabled={isMobilePdf || isMobilePng}
+        >
+          {isMobilePng ? <Loader2 size={14} className="animate-spin" /> : <FileImage size={14} />}
+          <span>PNG</span>
+        </button>
+
+        <button
+          type="button"
+          className="btn btn-secondary btn-sm"
+          style={{ padding: '0.4rem 0.6rem' }}
           onClick={triggerPrint}
         >
-          <Printer size={15} /> Print
+          <Printer size={15} />
         </button>
       </div>
 
@@ -159,14 +225,27 @@ export const DesignerView: React.FC = () => {
           .preview-column {
             width: 100% !important;
           }
-          .hide-mobile {
+          .editor-column.hide-mobile {
             display: none !important;
           }
+          .preview-column.hide-mobile {
+            position: absolute !important;
+            left: -99999px !important;
+            top: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            visibility: visible !important;
+            display: flex !important;
+            z-index: -999 !important;
+            width: 794px !important;
+            height: 1123px !important;
+          }
           .designer-workspace {
-            padding-bottom: 50px;
+            padding-bottom: 54px;
           }
         }
       `}</style>
     </div>
   );
 };
+

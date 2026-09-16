@@ -11,9 +11,12 @@ import {
   Sparkles,
   Menu,
   X,
+  Download,
+  Loader2,
 } from 'lucide-react';
 import { SAMPLE_PRESETS } from '../../data/defaultData';
 import { Modal } from './Modal';
+import { exportToPdf } from '../../utils/exportPdf';
 
 export const Navbar: React.FC = () => {
   const {
@@ -24,10 +27,31 @@ export const Navbar: React.FC = () => {
     savedDesigns,
     triggerPrint,
     loadPreset,
+    coverData,
+    showToast,
   } = useCoverDesigner();
 
   const [isSampleModalOpen, setIsSampleModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNavPdfExporting, setIsNavPdfExporting] = useState(false);
+
+  const handleNavPdfDownload = async () => {
+    const el = document.getElementById('assignment-cover-page');
+    if (!el) {
+      showToast('Please open the Designer to export the cover page.', 'error');
+      return;
+    }
+    setIsNavPdfExporting(true);
+    try {
+      await exportToPdf({ element: el, coverData });
+      showToast('PDF downloaded successfully!', 'success');
+    } catch (err) {
+      console.error('Navbar PDF export failed:', err);
+      showToast('Could not generate the PDF. Please try Print.', 'error');
+    } finally {
+      setIsNavPdfExporting(false);
+    }
+  };
 
   const navItems = [
     { id: 'designer', label: 'Designer', icon: Layout },
@@ -193,6 +217,22 @@ export const Navbar: React.FC = () => {
             >
               <Printer size={15} />
               <span className="hide-on-mobile">Print A4</span>
+            </button>
+
+            {/* Download PDF Button */}
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={handleNavPdfDownload}
+              disabled={isNavPdfExporting}
+              title="Download ISO standard A4 PDF"
+            >
+              {isNavPdfExporting ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <Download size={15} />
+              )}
+              <span className="hide-on-tiny">Download PDF</span>
             </button>
 
             {/* Dark / Light Theme Toggle */}

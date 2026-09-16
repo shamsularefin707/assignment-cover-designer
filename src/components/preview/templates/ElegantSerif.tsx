@@ -1,5 +1,6 @@
 import React from 'react';
 import { CoverData } from '../../../types/cover';
+import { CoverLogo } from '../CoverLogo';
 
 interface TemplateProps {
   coverData: CoverData;
@@ -34,18 +35,12 @@ export const ElegantSerif: React.FC<TemplateProps> = ({ coverData }) => {
     >
       {/* 1. Scholarly Masthead */}
       <div>
-        {customization.logoPosition !== 'hidden' && university.logoUrl && (
-          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-            <img
-              src={university.logoUrl}
-              alt={university.shortName}
-              style={{ maxHeight: logoDimensions, maxWidth: '160px', objectFit: 'contain' }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          </div>
-        )}
+        <CoverLogo
+          coverData={coverData}
+          maxHeight={logoDimensions}
+          maxWidth="160px"
+          style={{ marginBottom: '16px' }}
+        />
 
         <div
           style={{

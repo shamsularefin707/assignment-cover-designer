@@ -19,6 +19,13 @@ export function loadCurrentDraft(): CoverData {
       ...INITIAL_COVER_DATA,
       ...parsed,
       university: { ...INITIAL_COVER_DATA.university, ...parsed.university },
+      logo: parsed.logo || (parsed.customization?.customLogoUrl ? {
+        source: 'custom',
+        src: parsed.customization.customLogoUrl,
+      } : {
+        source: 'university',
+        src: parsed.university?.logoUrl || INITIAL_COVER_DATA.logo.src,
+      }),
       department: { ...INITIAL_COVER_DATA.department, ...parsed.department },
       course: { ...INITIAL_COVER_DATA.course, ...parsed.course },
       student: {

@@ -8,6 +8,7 @@ import { UniversityCentered } from './templates/UniversityCentered';
 import { ElegantSerif } from './templates/ElegantSerif';
 import { TechnicalReport } from './templates/TechnicalReport';
 import { CleanGrid } from './templates/CleanGrid';
+import { getActiveLogoSrc } from '../../utils/logoHelper';
 
 export const CoverPreview: React.FC<{
   containerRef?: React.RefObject<HTMLDivElement | null>;
@@ -134,12 +135,14 @@ export const CoverPreview: React.FC<{
           }}
         >
           {/* Subtle Institutional Watermark if logo exists */}
-          {university.logoUrl && (
+          {getActiveLogoSrc(coverData) && (
             <img
-              src={university.logoUrl}
+              key={getActiveLogoSrc(coverData)}
+              src={getActiveLogoSrc(coverData)}
               alt=""
               aria-hidden="true"
               className="a4-watermark-bg"
+              crossOrigin="anonymous"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}

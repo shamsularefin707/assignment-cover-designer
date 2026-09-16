@@ -10,6 +10,10 @@ export const INITIAL_COVER_DATA: CoverData = {
     logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/8/87/BUET_LOGO.svg/300px-BUET_LOGO.svg.png',
     isCustomLogo: false,
   },
+  logo: {
+    source: 'university',
+    src: 'https://upload.wikimedia.org/wikipedia/en/thumb/8/87/BUET_LOGO.svg/300px-BUET_LOGO.svg.png',
+  },
   department: {
     name: 'Department of Computer Science and Engineering (CSE)',
     isCustom: false,
