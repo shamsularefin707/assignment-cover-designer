@@ -6,7 +6,11 @@ A fully functional, responsive, production-quality academic web application buil
 ![React 19](https://img.shields.io/badge/React-19-61dafb?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?logo=typescript)
 ![Vite](https://img.shields.io/badge/Vite-8.3-646cff?logo=vite)
+[![Deploy with Vercel](https://vercel.com/button)](https://assignment-cover-designer.vercel.app)
 ![License](https://img.shields.io/badge/License-MIT-green)
+
+**Live Website**: 🚀 [https://assignment-cover-designer.vercel.app](https://assignment-cover-designer.vercel.app)
+
 
 ---
 
